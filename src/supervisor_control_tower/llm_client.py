@@ -47,10 +47,17 @@ class LlmJsonClient:
             )
 
         from openai import OpenAI
-        self._openai_client = OpenAI(
-            api_key=settings.openai_api_key,
-            timeout=settings.llm_timeout_seconds,
-        )
+
+        client_kwargs: dict[str, Any] = {
+            "api_key": settings.openai_api_key,
+            "timeout": settings.llm_timeout_seconds,
+        }
+
+        if settings.openai_base_url:
+            client_kwargs["base_url"] = settings.openai_base_url
+
+        self._openai_client = OpenAI(**client_kwargs)
+
         self._backend = "openai"
         self.model_name = settings.llm_model
         logger.info("LLM backend: OpenAI (%s)", settings.llm_model)
